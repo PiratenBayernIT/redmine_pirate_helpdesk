@@ -1,0 +1,10 @@
+---
+journal_mail_addresses_001:
+    id: 1
+    journal_id: 3
+    address: jsmith@somenet.foo
+    
+journal_mail_addresses_002:
+    id: 2
+    journal_id: 3
+    address: other@somenet.foo

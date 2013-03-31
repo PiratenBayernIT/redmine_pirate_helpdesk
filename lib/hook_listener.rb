@@ -13,13 +13,13 @@ def author_name(author)
 end
   
   
-def mailto_link(issue, author, body, linktext="")
+def mailto_link(issue, mail_address, body, linktext="")
   image = content_tag('img', linktext, 
     :src => '/plugin_assets/redmine_pirate_helpdesk/images/email.png', 
     :title => 'Per Mail antworten',
     :style => 'vertical-align: bottom; padding-right: 5px;') 
             
-  mail_to author.mail, image,
+  mail_to mail_address, image,
    :subject => "Re: #{issue.subject} [\##{issue.id}]",
    :cc => 'redmine@piratenpartei-bayern.de',
    :body => body
@@ -27,7 +27,7 @@ end
   
   
 def quote_text(text)
-(text.split("\n").map { |l| ">" + l }).join("\n")
+  (text.split("\n").map { |l| ">" + l }).join("\n")
 end
   
   
@@ -57,7 +57,7 @@ class HookListener < Redmine::Hook::ViewListener
     author = issue.author
     body = author_name(author) + " schrieb:\n"
     body << quote_text(issue.description)
-    return mailto_link(issue, author, body, 'Mailantwort')
+    return mailto_link(issue, author.mail, body, 'Mailantwort')
   end
   
   def helper_journals_links(context={})
@@ -69,7 +69,17 @@ class HookListener < Redmine::Hook::ViewListener
     author = journal.user
     body = author_name(author) + " schrieb:\n\n"
     body << quote_text(journal.notes)
-    context[:links] << mailto_link(context[:issue], author, body)
+    context[:links] << mailto_link(context[:issue], author.mail, body)
   end
-  
+
+  def view_issues_history_journal_bottom(context={})
+    journal = context[:journal]
+    if journal.mail_recipients.empty? or not mail_allowed?(context[:project])
+      return
+    else
+      items = journal.mail_recipients.map { |a| content_tag('li', a.address) }
+      content = "Mail an:\n".html_safe + content_tag('ul', items.join.html_safe)
+      return content
+    end
+  end
 end

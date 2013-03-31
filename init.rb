@@ -1,4 +1,7 @@
 require 'hook_listener'
+require 'mail_handler_patch'
+require 'journal_patch'
+require 'redmine_pirate_helpdesk'
 
 Redmine::Plugin.register :redmine_pirate_helpdesk do
   name 'Redmine Pirate Helpdesk plugin'
